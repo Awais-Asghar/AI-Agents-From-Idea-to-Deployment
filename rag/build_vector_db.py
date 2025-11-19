@@ -1,11 +1,16 @@
 """Utility script to build the FAISS vector store backing the local RAG tool."""
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
 
 from tools.rag_tool import DEFAULT_EMBEDDING_MODEL
 

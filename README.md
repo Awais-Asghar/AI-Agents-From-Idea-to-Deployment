@@ -39,9 +39,18 @@ agentic-workshop/
 │   │   └── sample_docs.txt
 │   └── vectorstore/
 └── frontend/
-    ├── app.py
-    └── requirements.txt
+   └── app.py
 ```
+
+## Built-in Agent Tooling
+
+Every agent in the crew (planner, researcher, writer, reviewer) receives the same trio of tools via `tools.get_default_toolkit()`:
+
+- `local_rag_search`: FAISS-backed retrieval over curated workshop documents for grounded answers.
+- `duckduckgo_search`: Live DuckDuckGo lookups when the topic needs current context or external validation.
+- `calculator`: A deterministic evaluator for quick math, metrics, or cost estimates referenced in drafts.
+
+Having the shared toolkit means any role can validate facts or pull references without delegating to the researcher.
 
 ## Prerequisites
 
@@ -63,7 +72,7 @@ agentic-workshop/
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. **Install backend dependencies**
+3. **Install project dependencies**
    ```powershell
    pip install -r requirements.txt
    ```
@@ -102,17 +111,15 @@ print(result)
 
 ## Running the Streamlit Frontend
 
-1. Install frontend dependencies (optional if you already installed the backend requirements):
-   ```powershell
-   pip install -r frontend\requirements.txt
-   ```
+Launch the UI from the virtual environment so Streamlit can resolve the backend packages:
 
-2. Launch the UI:
-   ```powershell
-   streamlit run frontend\app.py
-   ```
+```powershell
+python -m streamlit run frontend\app.py
+```
 
-3. Enter a workshop topic in the sidebar and click **Run Pipeline**. The output panel displays the aggregated crew result when the run completes.
+Enter a workshop topic in the sidebar and click **Run Pipeline**. The output panel displays the aggregated crew result when the run completes.
+
+If you prefer to call the executable directly on Windows, use `.\.venv\Scripts\streamlit.exe run frontend\app.py` from the activated environment.
 
 ## Customising Agents and Tasks
 
@@ -122,18 +129,26 @@ print(result)
 - **LLM Settings**: Tweak `config/settings.py` to experiment with temperatures, token limits, or alternative OpenRouter models.
 - **Knowledge Base**: Replace `rag/documents/sample_docs.txt` with your own corpus and re-run `python rag\build_vector_db.py`.
 
+## Deploying the System
+
+- **Streamlit Community Cloud**: Upload the repo, set environment variables (`OPENROUTER_API_KEY`, optional fallbacks) in the project settings, and ensure `requirements.txt` is listed as the sole dependency file.
+- **Containerised App**: Package the CLI and Streamlit UI inside a Docker image (start from `python:3.11-slim`, copy the repo, install requirements, expose port 8501). Deploy to Azure App Service, AWS App Runner, or Google Cloud Run.
+- **API Gateway**: Wrap `run_workshop_pipeline` with FastAPI or Flask to expose a `/run` endpoint, then host behind a queue/worker on ECS, Azure Container Apps, or Fly.io for managed execution.
+- **Enterprise Integration**: For internal workshops, schedule the pipeline via orchestration tools (Airflow, Prefect) and archive outputs to cloud storage, allowing instructors to diff successive runs.
+
 ## Troubleshooting Tips
 
 - **Missing Vector Store**: If the research task fails to load the FAISS index, ensure `rag/vectorstore/` contains the generated files. Re-run the build script if needed.
 - **Authentication Errors**: Double-check that `OPENROUTER_API_KEY` is present in your environment. The app raises an explicit error if it is missing.
-- **Slow Runs**: The free tier of `meta-llama/llama-3.3-70b-instruct` can be rate limited. Consider changing the topic or upgrading your OpenRouter plan for better throughput.
 - **Dependency Issues**: Match the Python version requirement and reinstall with `pip install --upgrade -r requirements.txt` when packages change.
 
 ## Next Steps for Students
-
-1. Experiment with parallel task execution (`Process.parallel`) inside `crew.py` and evaluate trade-offs.
-2. Introduce an evaluation agent that scores drafts against rubrics and stores metrics.
-3. Deploy the Streamlit app to a cloud host (Streamlit Community Cloud, Azure, etc.) using environment secrets.
-4. Add unit tests for custom tools or RAG pipelines to promote reproducibility.
+Each student in a group should take an agent and then write its prompt.
+1. Try to develop a simple crew AI chain for any basic task. (Like Research, Newsroom, Study Companion and sky is the limit)
+2. Add or Remove an Agent
+3. Try to make a new tool, like drawing maker. (Hint use canvas and LLM written code to draw lines on it)
+4. Try Deploying
+5. Play around with Prompts
+Run the pipeline ;)
 
 Happy building! Customize freely to turn this template into a polished workshop experience.

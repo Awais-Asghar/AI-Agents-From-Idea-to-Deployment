@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import ast
+import logging
 import operator
 from typing import Any, Dict
 
-from langchain.tools import BaseTool
-from langchain_core.callbacks import CallbackManagerForToolRun
+from crewai.tools import BaseTool
 
 _ALLOWED_OPERATORS: Dict[type[ast.AST], Any] = {
     ast.Add: operator.add,
@@ -20,30 +20,23 @@ _ALLOWED_OPERATORS: Dict[type[ast.AST], Any] = {
 
 
 class CalculatorTool(BaseTool):
-    name = "deterministic_calculator"
-    description = (
+    name: str = "deterministic_calculator"
+    description: str = (
         "Perform precise arithmetic on simple expressions. "
         "Supports addition, subtraction, multiplication, division, modulus, and powers."
     )
 
-    def _run(
-        self,
-        query: str,
-        run_manager: CallbackManagerForToolRun | None = None,  # noqa: ARG002 - standard signature
-    ) -> str:
+    _logger = logging.getLogger(__name__)
+
+    def _run(self, query: str) -> str:
         try:
             expression = ast.parse(query, mode="eval").body
             result = self._eval(expression)
+            self._logger.info("Calculator evaluated '%s' -> %s", query, result)
             return str(result)
         except Exception as exc:  # pragma: no cover - defensive layer
+            self._logger.exception("Calculator failed for expression '%s'", query)
             raise ValueError(f"Failed to evaluate expression '{query}': {exc}") from exc
-
-    async def _arun(
-        self,
-        query: str,
-        run_manager: CallbackManagerForToolRun | None = None,
-    ) -> str:  # pragma: no cover - async interface not required for workshop
-        raise NotImplementedError("CalculatorTool does not support async execution.")
 
     def _eval(self, node: ast.AST) -> float:
         if isinstance(node, ast.Num):  # type: ignore[attr-defined]

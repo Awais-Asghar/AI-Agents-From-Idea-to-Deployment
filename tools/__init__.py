@@ -4,6 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List
 
+from crewai.tools import BaseTool
+
 from .calculator import CalculatorTool
 from .rag_tool import LocalRAGTool
 from .web_search import create_web_search_tool
@@ -30,7 +32,7 @@ def create_calculator_tool() -> CalculatorTool:
     return CalculatorTool()
 
 
-def get_default_toolkit() -> List[object]:
+def get_default_toolkit() -> List[BaseTool]:
     """Provide the standard set of tools shared by research-heavy agents."""
     return [
         create_rag_tool(),
