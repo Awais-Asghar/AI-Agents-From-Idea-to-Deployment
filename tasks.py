@@ -50,21 +50,30 @@ def create_research_task(agent, tools=None) -> Task:
 
 
 def create_writing_task(agent) -> Task:
-    """Task 3 placeholder: author deliverables."""
+    """Task: Author workshop deliverables using research insights."""
     return Task(
+        name="Author Workshop Materials",
+        agent=agent,
         description=(
-            "Add description for Task 3."
-            # "Draft the workshop narrative for '{topic}', including an overview, prerequisites, step-by-step labs, and deployment notes. "
-            # "Incorporate the research insights and calculator results where helpful."
+            "Draft the complete workshop narrative for the given topic, including: "
+            "1) Overview and learning objectives, "
+            "2) Prerequisites and setup instructions, "
+            "3) Step-by-step lab exercises with examples, "
+            "4) Deployment notes and practical recommendations. "
+            "Incorporate research insights from the researcher agent "
+            "and any calculator/tool outputs where relevant."
         ),
         expected_output=(
-            "Add expected output for Task 3."
-            # "A Markdown-formatted workshop guide with sections for Goals, Agenda, Hands-on Labs, Deployment, and Resources."
+            "A well-structured Markdown document including the following sections:\n"
+            "- Goals & Agenda\n"
+            "- Hands-on Labs with code walkthroughs\n"
+            "- Deployment Guidelines\n"
+            "- Resources & References\n"
+            "Content should be clear, actionable, and instructor-friendly."
         ),
-        agent=agent,
-        name="Task 3",  # "Writing"
     )
 
+<<<<<<< HEAD
 
 # def create_review_task(agent) -> Task:
 #     """Task 4 placeholder: review compiled deliverables."""
@@ -84,6 +93,8 @@ def create_writing_task(agent) -> Task:
 
 # My part of the code(Muhammad Ahmad)
 
+=======
+>>>>>>> 0370c27ac95ad3d718b5ba934afd0c0de0da2044
 def create_review_task(agent) -> Task:
     """Task 4: Review the research output for accuracy and completeness."""
     return Task(
